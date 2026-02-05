@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -15,8 +15,69 @@ import {
 import { COLORS } from '../theme/colors';
 import AppLogo from '../components/AppLogo';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { authStart, authError, authSuccess, setPendingPhone } from "../redux/slices/authSlice";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { registerWithGoogle, startRegister } from "../services/authService";
+
 
 export default function RegisterScreen() {
+
+  const dispatch = useDispatch(); 
+
+   const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    password: ""
+  });
+  
+  const handleRegister = async () => {
+    try {
+      dispatch(authStart());
+
+      await startRegister(form);
+
+      dispatch(setPendingPhone(form.phone));
+      navigation.navigate("Otp");
+    } catch (err) {
+      dispatch(authError(err.response?.data?.message || "Error"));
+    }
+  };
+
+ const handleGoogleRegister = async () => {
+  try {
+    dispatch(authStart());
+
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    const userInfo = await GoogleSignin.signIn();
+
+    const idToken = userInfo.idToken;
+    if (!idToken) throw new Error("No Google ID token");
+
+    const res = await registerWithGoogle(idToken);
+
+    // 👇 THIS is what you want
+    console.log("Google register API response:", res.data);
+
+    dispatch(authSuccess(res.data.token));
+    navigation.replace("HomeTabs");
+  } catch (err) {
+  console.log("Google register error (raw):", err);
+  console.log("Google register error message:", err.message);
+  console.log("Google register error code:", err.code);
+  console.log("Google register error stack:", err.stack);
+
+  dispatch(
+    authError(
+      err.message || "Google registration failed"
+    )
+  );
+}
+
+};
+
+
   const navigation = useNavigation();
 
   const styles = StyleSheet.create({
@@ -98,6 +159,21 @@ export default function RegisterScreen() {
     color: COLORS.primary,
     fontWeight: '600',
   },
+  googleButton: {
+    width: '100%',
+    height: 48,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  googleText: {
+    color: '#000',
+    fontWeight: '600',
+  }
 });
 
 
@@ -128,6 +204,7 @@ export default function RegisterScreen() {
                 placeholder="John Doe"
                 placeholderTextColor="#BDBDBD"
                 style={styles.input}
+                onChangeText={(v) => setForm({ ...form, name: v })}
               />
 
               <Text style={styles.label}>Phone Number</Text>
@@ -136,6 +213,7 @@ export default function RegisterScreen() {
                 placeholderTextColor="#BDBDBD"
                 style={styles.input}
                 keyboardType="phone-pad"
+                onChangeText={(v) => setForm({ ...form, phone: v })} 
               />
 
               <Text style={styles.label}>E-mail</Text>
@@ -144,6 +222,7 @@ export default function RegisterScreen() {
                 placeholderTextColor="#BDBDBD"
                 style={styles.input}
                 keyboardType="email-address"
+                onChangeText={(v) => setForm({ ...form, email: v })}
               />
 
               <Text style={styles.label}>Password</Text>
@@ -152,10 +231,19 @@ export default function RegisterScreen() {
                 placeholderTextColor="#BDBDBD"
                 secureTextEntry
                 style={styles.input}
+                onChangeText={(v) => setForm({ ...form, password: v })}
               />
 
-              <TouchableOpacity activeOpacity={0.85} style={styles.button}>
+              <TouchableOpacity activeOpacity={0.85} style={styles.button} onPress={handleRegister}>
                 <Text style={styles.buttonText}>Register</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.googleButton}
+                activeOpacity={0.85}
+                onPress={handleGoogleRegister}
+              >
+                <Text style={styles.googleText}>Register with Google</Text>
               </TouchableOpacity>
 
               <Text style={styles.footer}>

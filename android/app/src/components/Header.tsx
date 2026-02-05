@@ -1,21 +1,75 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { COLORS } from '../theme/colors';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, Pressable, Modal, TouchableOpacity } from 'react-native';
 import AppLogo from '../components/AppLogo';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
 
 
 export default function Header() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const [menuVisible, setMenuVisible] = useState(false);
+
   return (
     <View style={styles.header}>
       <Text style={styles.coin}>🏆 270</Text>
       <AppLogo size={160} />
-      <Image source={{ uri: 'https://i.pravatar.cc/100' }} style={styles.avatar} />
-    
+      <Pressable onPress={() => setMenuVisible(true)}>
+        <Image
+          source={{ uri: 'https://i.pravatar.cc/100' }}
+          style={styles.avatar}
+        />
+      </Pressable>
+      <Modal
+        transparent
+        animationType="fade"
+        visible={menuVisible}
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <Pressable style={styles.overlay} onPress={() => setMenuVisible(false)}>
+          <View style={styles.menu}>
+
+            <Pressable style={styles.menuItem}>
+              <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                <Text >Profile</Text>
+              </TouchableOpacity>
+            </Pressable>
+            <Pressable style={styles.menuItem}>
+              <Text>Settings</Text>
+            </Pressable>
+            <Pressable style={styles.menuItem}>
+              <Text style={{ color: 'red' }}>Logout</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+      {/* <Image source={{ uri: 'https://i.pravatar.cc/100' }} style={styles.avatar} /> */}
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  menu: {
+    position: 'absolute',
+    top: 90,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingVertical: 8,
+    width: 160,
+    elevation: 5,
+  },
+  menuItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
   header: {
     paddingTop: 50,
     paddingHorizontal: 20,

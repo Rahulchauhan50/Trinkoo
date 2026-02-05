@@ -17,6 +17,11 @@ import { Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { useDispatch } from "react-redux";
+import { authStart, authSuccess, authError } from "../redux/slices/authSlice";
+
+
 
 
 
@@ -24,8 +29,28 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 
 export default function LoginScreen() {
 
-    const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const dispatch = useDispatch();
+
+    const handleGoogleLogin = async () => {
+        try {
+            dispatch(authStart());
+
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+
+            const idToken = userInfo?.idToken;
+
+            const res = await googleLogin(idToken);
+
+
+            dispatch(authSuccess(res.data.token));
+            navigation.replace("HomeTabs");
+        } catch (error) {
+            console.log("Google Sign-In error:", error);
+            dispatch(authError("Google sign-in failed"));
+        }
+    };
 
 
     const styles = StyleSheet.create({
@@ -113,6 +138,22 @@ export default function LoginScreen() {
         scrollContent: {
             flexGrow: 1,
         },
+        googleButton: {
+            width: "100%",
+            height: 48,
+            backgroundColor: "#fff",
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: "#ddd",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 12
+        },
+        googleText: {
+            color: "#000",
+            fontWeight: "600"
+        }
+
     });
 
     return (
@@ -159,12 +200,20 @@ export default function LoginScreen() {
                             />
 
                             <TouchableOpacity
-  activeOpacity={0.85}
-  style={styles.button}
-  onPress={() => navigation.replace('HomeTabs')}
->
-  <Text style={styles.buttonText}>Login</Text>
-</TouchableOpacity>
+                                activeOpacity={0.85}
+                                style={styles.button}
+                                onPress={() => navigation.replace('HomeTabs')}
+                            >
+                                <Text style={styles.buttonText}>Login</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, { backgroundColor: "#fff", borderWidth: 1 }]}
+                                onPress={handleGoogleLogin}
+                            >
+                                <Text style={{ color: "#000", fontWeight: "600" }}>
+                                    Continue with Google
+                                </Text>
+                            </TouchableOpacity>
 
                             <Text style={styles.footer}>
                                 Already have account?{' '}

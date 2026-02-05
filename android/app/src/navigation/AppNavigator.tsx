@@ -6,6 +6,15 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import BottomTabs from './BottomTabs';
+import FlappyBirdScreen from '../games/FlappyBirdScreen';
+import LudoScreen from '../games/LudoScreen';
+import BubbleShooterScreen from '../games/BubbleShooterScreen';
+import CandyCrushScreen from '../games/CandyCrushScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import DailyCheckIn from '../screens/DailyCheckinScreen';
+import RedemptionsScreen from '../screens/RedemptionsScreen';
+import ChatScreen from '../screens/ChatScreen';
+
 
 export type RootStackParamList = {
   Onboarding: undefined;
@@ -27,6 +36,14 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="HomeTabs" component={BottomTabs} />
+        <Stack.Screen name="FlappyBird" component={FlappyBirdScreen} />
+        <Stack.Screen name="Ludo" component={LudoScreen} />
+        <Stack.Screen name="BubbleShooter" component={BubbleShooterScreen} />
+        <Stack.Screen name="CandyCrush" component={CandyCrushScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="DailyCheckin" component={DailyCheckIn} />
+        <Stack.Screen name="Redemptions" component={RedemptionsScreen} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} /> 
       </Stack.Navigator>
     </NavigationContainer>
   );

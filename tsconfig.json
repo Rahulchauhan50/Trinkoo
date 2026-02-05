@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["jest"],
   },
-  "include": ["**/*.ts", "**/*.tsx", "android/app/src/components/Team"],
+  "include": ["**/*.ts", "**/*.tsx", "android/app/src/components/Team", "android/app/src/screens/OtpScreen.tsx"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

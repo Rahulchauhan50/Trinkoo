@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "571867034037",
+    "project_id": "spotify-9138a",
+    "storage_bucket": "spotify-9138a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571867034037:android:5979b80610ca36bc8269fc",
+        "android_client_info": {
+          "package_name": "com.trinkoo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "571867034037-4kjj1r1n7n6n2kpt62a8jjgn2bd6iuht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trinkoo",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "571867034037-rv45nrraksutv1chsi48eb3ihncn07gl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2WbHoUaKxSC1GXEAFlzZPc9KH_8B0Wls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "571867034037-p19bf0k432h6kouqsrm43btkka0l9u4i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

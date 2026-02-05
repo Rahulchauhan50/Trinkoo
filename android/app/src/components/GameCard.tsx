@@ -1,5 +1,7 @@
 import React from 'react';
-import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 import {
   View,
@@ -13,9 +15,12 @@ type Props = {
   title: string;
   mode: string;
   image: any;
+  routeName: keyof RootStackParamList; 
 };
 
-export default function GameCard({ title, mode, image }: Props) {
+export default function GameCard({ title, mode, image, routeName }: Props) {
+      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  
   return (
     <View style={styles.wrapper}>
       <ImageBackground
@@ -27,7 +32,7 @@ export default function GameCard({ title, mode, image }: Props) {
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.mode}>{mode}</Text>
 
-          <TouchableOpacity style={styles.btn}>
+          <TouchableOpacity onPress={() => navigation.navigate(routeName)} style={styles.btn}>
             <Text style={styles.btnText}>Start Game</Text>
           </TouchableOpacity>
         </View>

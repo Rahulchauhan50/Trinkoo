@@ -1,9 +1,14 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
 import { COLORS } from '../../theme/colors';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../navigation/AppNavigator';
 
 export default function DirectMessageCard({ name, message, time, image, online }: any) {
+   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
+    <TouchableOpacity activeOpacity={0.8} onPress={() => navigation.navigate('ChatScreen')}>
     <View style={styles.card}>
       <View>
         <Image source={image} style={styles.avatar} />
@@ -19,6 +24,7 @@ export default function DirectMessageCard({ name, message, time, image, online }
 
       <Text style={styles.time}>{time}</Text>
     </View>
+    </TouchableOpacity>
   );
 }
 const styles = StyleSheet.create({

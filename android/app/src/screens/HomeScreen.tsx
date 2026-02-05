@@ -7,7 +7,8 @@ import SearchBar from '../components/SearchBar';
 import GameCard from '../components/GameCard';
 import GameCardd from '../components/GameCardd';
 import { COLORS } from '../theme/colors';
-import { ScreenContainer } from 'react-native-screens';
+import { WebView } from 'react-native-webview';
+
 
 export default function HomeScreen() {
 
@@ -38,7 +39,7 @@ export default function HomeScreen() {
     return (
         <View style={styles.container}>
             <Header />
-
+             
             <ScrollView showsVerticalScrollIndicator={false}>
                 <DailyCheckIn />
 
@@ -48,17 +49,17 @@ export default function HomeScreen() {
                 <View style={styles.col}>
 
                     <View style={styles.grid}>
-                        <GameCard title="Flappy Bird" image={require('../assets/images/flappy.png')} mode="Single Player" />
-                        <GameCardd title="Ular Angka" image={require('../assets/images/ular.png')} mode="Single Player" />
-                        <GameCard title="Flappy Bird" image={require('../assets/images/flappy.png')} mode="Single Player" />
-                        <GameCardd title="Ular Angka" image={require('../assets/images/ular.png')} mode="Single Player" />
+                        <GameCard routeName="FlappyBird" title="Carrom Hero" image={require('../assets/images/carrom.png')} mode="Single Player" />
+                        <GameCard  routeName='CandyCrush' title="Candy Crush" image={require('../assets/images/candy.png')} mode="Single Player" />
                        
                     </View>
                     <View style={styles.grid}>
-                        <GameCardd title="Flappy Bird" image={require('../assets/images/tetris.png')} mode="Single Player" />
-                        <GameCard title="Ular Angka" image={require('../assets/images/walk.png')} mode="Single Player" />
-                        <GameCardd title="Flappy Bird" image={require('../assets/images/tetris.png')} mode="Single Player" />
-                        <GameCard title="Ular Angka" image={require('../assets/images/walk.png')} mode="Single Player" />
+                        <GameCard routeName="Ludo" title="Ludo King" image={require('../assets/images/ludo.png')} mode="Single Player" />
+                        <GameCard routeName='BubbleShooter' title="Bubble Shooter" image={require('../assets/images/bubble.png')} mode="Single Player" />
+                        {/* <GameCardd title="Ular Angka" image={require('../assets/images/ular.png')} mode="Single Player" /> */}
+                        {/* <GameCardd title="Flappy Bird" image={require('../assets/images/tetris.png')} mode="Single Player" /> */}
+                        {/* <GameCardd title="Flappy Bird" image={require('../assets/images/tetris.png')} mode="Single Player" /> */}
+                        {/* <GameCardd routeName="Ludo" title="Ular Angka" image={require('../assets/images/ular.png')} mode="Single Player" /> */}
                        
                     </View>
                 </View>
