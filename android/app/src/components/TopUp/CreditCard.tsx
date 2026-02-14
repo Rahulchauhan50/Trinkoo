@@ -1,10 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../../theme/colors';
+import { RootStackParamList } from '../../navigation/AppNavigator';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function CreditCard({ credit, price, subscribe }: any) {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('PaymentScreen')}>
       {subscribe && <View style={styles.badge}><Text style={styles.badgeText}>Subscribe</Text></View>}
 
       <Text style={styles.credit}>{credit} Credit</Text>
@@ -12,7 +17,7 @@ export default function CreditCard({ credit, price, subscribe }: any) {
       <View style={styles.priceBox}>
         <Text style={styles.price}>{price}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 const styles = StyleSheet.create({

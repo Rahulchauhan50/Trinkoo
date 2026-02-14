@@ -3,7 +3,7 @@ import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 // import { GAMES } from '../../constants/games';
 
-const GAME_URL = 'https://www.gamezop.com/en/game/carrom-hero/H1Hgyn6XqAS';
+const GAME_URL = 'https://www.gamezop.com/en/game/fruit-chop/rkWfy2pXq0r';
 
 const injectedJS = `
   (function () {
@@ -29,9 +29,7 @@ const injectedJS = `
   })();
 `;
 
-
-
-export default function FlappyBirdScreen() {
+export default function FruitNinja() {
   return (
     <View style={styles.container}>
       <WebView

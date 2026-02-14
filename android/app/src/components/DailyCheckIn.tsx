@@ -1,14 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
 
 export default function DailyCheckIn() {
+          const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  
   return (
-    <View style={styles.card}>
+    <TouchableOpacity activeOpacity={0.8} style={styles.card} onPress={() => navigation.navigate('DailyCheckin')}>
       <Text style={styles.title}>Daily Check In</Text>
       <Text style={styles.sub}>Get 5 credits every day!</Text>
       <View style={styles.progress} />
       <Text style={styles.day}>Day 1</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 

@@ -15,7 +15,7 @@ export default function TopUpScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <BalanceCard />
+        {/* <BalanceCard /> */}
 
         <View style={styles.grid}>
           <CreditCard credit="30" price="₹100.00" />
@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.primary,
+    
   },
   header: {
     paddingTop: 60,
@@ -74,13 +75,14 @@ const styles = StyleSheet.create({
   },
   buyBtn: {
     marginHorizontal: 20,
-    marginTop: 28,
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: 0,
     borderRadius: 30,
     borderWidth: 1.5,
     borderColor: COLORS.white,
     paddingVertical: 14,
     alignItems: 'center',
+    bottom: 0,
   },
   buyText: {
     color: COLORS.white,

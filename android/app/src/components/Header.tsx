@@ -32,14 +32,14 @@ export default function Header() {
           <View style={styles.menu}>
 
             <Pressable style={styles.menuItem}>
-              <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+              <TouchableOpacity onPress={() => {setMenuVisible(false);navigation.navigate('Profile')}}>
                 <Text >Profile</Text>
               </TouchableOpacity>
             </Pressable>
             <Pressable style={styles.menuItem}>
               <Text>Settings</Text>
             </Pressable>
-            <Pressable style={styles.menuItem}>
+            <Pressable onPress={() => {setMenuVisible(false);navigation.navigate('Login')}} style={styles.menuItem}>
               <Text style={{ color: 'red' }}>Logout</Text>
             </Pressable>
           </View>

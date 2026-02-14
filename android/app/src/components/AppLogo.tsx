@@ -7,7 +7,7 @@ export default function AppLogo({ size = 120 }: { size?: number }) {
       source={require('../assets/images/logo.png')}
       style={[
         styles.logo,
-        { width: 120, height: 60 },
+        { width: size, height: 60 },
       ]}
       resizeMode="contain"
     />

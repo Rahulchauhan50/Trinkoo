@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share } from 'react-native';
 import { COLORS } from '../theme/colors';
 import InviteFriends from '../components/Team/InviteFriends';
 import DirectMessageCard from '../components/Team/DirectMessageCard';
 
 export default function TeamScreen() {
+   const onShare = async () => {
+        try {
+          await Share.share({
+            message: 'Check this out! Trinnkoo is an amazing app to connect with friends and play games together. Join me on Trinnkoo and let\'s have some fun!',
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      };
   return (
     <View style={styles.container}>
       {/* HEADER */}
@@ -13,7 +22,7 @@ export default function TeamScreen() {
           Invite your friends to play together!
         </Text>
 
-        <TouchableOpacity style={styles.addBtn}>
+        <TouchableOpacity onPress={onShare}  style={styles.addBtn}>
           <Text style={{ color: COLORS.white }}>👥+</Text>
         </TouchableOpacity>
       </View>

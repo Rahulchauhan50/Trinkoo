@@ -3,7 +3,7 @@ import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 // import { GAMES } from '../../constants/games';
 
-const GAME_URL = 'https://www.gamezop.com/en/game/carrom-hero/H1Hgyn6XqAS';
+const GAME_URL = 'https://www.gamezop.com/en/game/battleships-armada/rkt7TzJv9k7';
 
 const injectedJS = `
   (function () {
@@ -31,7 +31,7 @@ const injectedJS = `
 
 
 
-export default function FlappyBirdScreen() {
+export default function ShipScreen() {
   return (
     <View style={styles.container}>
       <WebView

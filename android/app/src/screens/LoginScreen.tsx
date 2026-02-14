@@ -20,6 +20,8 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useDispatch } from "react-redux";
 import { authStart, authSuccess, authError } from "../redux/slices/authSlice";
+import { Image } from 'react-native';
+
 
 
 
@@ -147,12 +149,15 @@ export default function LoginScreen() {
             borderColor: "#ddd",
             justifyContent: "center",
             alignItems: "center",
-            marginTop: 12
+            marginTop: 12,
+            flexDirection: 'row', // This aligns the icon and text horizontally
+            paddingHorizontal: 20,
         },
         googleText: {
             color: "#000",
             fontWeight: "600"
-        }
+        },
+
 
     });
 
@@ -207,9 +212,19 @@ export default function LoginScreen() {
                                 <Text style={styles.buttonText}>Login</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.button, { backgroundColor: "#fff", borderWidth: 1 }]}
+                                style={[styles.button, styles.googleButton, { backgroundColor: "#fff", borderWidth: 1 }]}
                                 onPress={handleGoogleLogin}
                             >
+                                {/* <Chrome color="#4285F4" size={20} style={{ marginRight: 10 }} /> */}
+                                {/* <FontAwesome name="google" size={20} color="white" /> */}
+                                <Image
+                                    source={require('../assets/images/google-logo.png')}
+                                    style={[
+                                        // styles.logo,
+                                        { width: 24, height: 40, marginRight: 10 },
+                                    ]}
+                                    resizeMode="contain"
+                                />
                                 <Text style={{ color: "#000", fontWeight: "600" }}>
                                     Continue with Google
                                 </Text>

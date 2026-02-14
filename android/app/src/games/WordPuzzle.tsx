@@ -3,7 +3,7 @@ import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 // import { GAMES } from '../../constants/games';
 
-const GAME_URL = 'https://www.gamezop.com/en/game/carrom-hero/H1Hgyn6XqAS';
+const GAME_URL = 'https://www.gamezop.com/en/game/word-finder/r1K-J3TQ5Ar';
 
 const injectedJS = `
   (function () {
@@ -31,7 +31,7 @@ const injectedJS = `
 
 
 
-export default function FlappyBirdScreen() {
+export default function WordPuzzle() {
   return (
     <View style={styles.container}>
       <WebView
@@ -64,3 +64,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
 });
+

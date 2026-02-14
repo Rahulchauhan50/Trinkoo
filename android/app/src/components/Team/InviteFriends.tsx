@@ -3,7 +3,11 @@ import { View, StyleSheet } from 'react-native';
 import FriendAvatar from './FriendAvatar';
 import { COLORS } from '../../theme/colors';
 
+
 export default function InviteFriends() {
+
+ 
+
   return (
     <View style={styles.card}>
       <View style={styles.grid}>
@@ -16,6 +20,7 @@ export default function InviteFriends() {
         <FriendAvatar name="Emily Sui" image={require('../../assets/avatars/a2.png')} />
         <FriendAvatar name="Bella Gui" image={require('../../assets/avatars/a3.png')} />
       </View>
+     
     </View>
   );
 }
