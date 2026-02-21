@@ -14,3 +14,4 @@ export const registerWithGoogle = (idToken) => {
 export const loginWithGoogle = (idToken) => {
   return api.post("/auth/login-with-google", { idToken });
 };
+  

@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { COLORS } from '../theme/colors';
 import AppLogo from '../components/AppLogo';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { authStart, authError, authSuccess, setPendingPhone } from "../redux/slices/authSlice";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
@@ -47,14 +47,20 @@ export default function RegisterScreen() {
   };
 
   const handleGoogleRegister = async () => {
+    await GoogleSignin.signOut();
     try {
       dispatch(authStart());
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const userInfo = await GoogleSignin.signIn();
 
+      console.log("--- GOOGLE USER DATA ---");
+      console.log("User Info Object:", JSON.stringify(userInfo, null, 2));
+
+
       const idToken = userInfo.idToken;
       if (!idToken) throw new Error("No Google ID token");
+
 
       const res = await registerWithGoogle(idToken);
 
@@ -78,8 +84,7 @@ export default function RegisterScreen() {
 
   };
 
-
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   const styles = StyleSheet.create({
     scrollContent: {
@@ -256,12 +261,13 @@ export default function RegisterScreen() {
                 />
                 <Text style={styles.googleText}>Register with Google</Text>
               </TouchableOpacity>
+             
 
               <Text style={styles.footer}>
                 Already have account?{' '}
                 <Text
                   style={styles.link}
-                 onPress={() => navigation.navigate('Login')}
+                  onPress={() => navigation.navigate('Login')}
                 >
                   Login here
                 </Text>
@@ -272,4 +278,6 @@ export default function RegisterScreen() {
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
+
+
 }

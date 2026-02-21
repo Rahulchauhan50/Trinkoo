@@ -18,39 +18,34 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { useDispatch } from "react-redux";
-import { authStart, authSuccess, authError } from "../redux/slices/authSlice";
+// import { useDispatch } from "react-redux";
+// import { authStart, authSuccess, authError } from "../redux/slices/authSlice";
 import { Image } from 'react-native';
-
-
-
-
-
 
 
 
 export default function LoginScreen() {
 
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const handleGoogleLogin = async () => {
         try {
-            dispatch(authStart());
+            // dispatch(authStart());
 
             await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
+            // const userInfo = await GoogleSignin.signIn();
 
-            const idToken = userInfo?.idToken;
+            // const idToken = userInfo?.idToken;
 
-            const res = await googleLogin(idToken);
+            // const res = await googleLogin(idToken);
 
 
-            dispatch(authSuccess(res.data.token));
+            // dispatch(authSuccess(res.data.token));
             navigation.replace("HomeTabs");
         } catch (error) {
             console.log("Google Sign-In error:", error);
-            dispatch(authError("Google sign-in failed"));
+            // dispatch(authError("Google sign-in failed"));
         }
     };
 
