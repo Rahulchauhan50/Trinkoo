@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
+  Animated,
   Text,
   StyleSheet,
   TextInput,
@@ -17,7 +18,8 @@ import { COLORS } from '../theme/colors';
 import AppLogo from '../components/AppLogo';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { authStart, authError, authSuccess, setPendingPhone } from "../redux/slices/authSlice";
+import { authStart, authError, authSuccess, setUser } from "../redux/slices/authSlice";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { registerWithGoogle, startRegister } from "../services/authService";
 
@@ -32,17 +34,135 @@ export default function RegisterScreen() {
     email: "",
     password: ""
   });
+  const [emailError, setEmailError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const emailRef = useRef<any>(null);
+  const nameRef = useRef<any>(null);
+  const phoneRef = useRef<any>(null);
+  const passwordRef = useRef<any>(null);
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  const toastOpacity = useRef(new Animated.Value(0)).current;
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  let toastTimer: any = null;
+
+  const triggerShake = () => {
+    shakeAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: -6, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 6, duration: 50, useNativeDriver: true }),
+      Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+    ]).start();
+  };
 
   const handleRegister = async () => {
+    // client-side validation
+    setNameError('');
+    setPhoneError('');
+    setEmailError('');
+    setPasswordError('');
+
+    const firstEmpty = (
+      !form.name ? 'name' : !form.phone ? 'phone' : !form.email ? 'email' : !form.password ? 'password' : null
+    );
+
+    if (firstEmpty) {
+      if (firstEmpty === 'name') setNameError('Field is required');
+      if (firstEmpty === 'phone') setPhoneError('Field is required');
+      if (firstEmpty === 'email') setEmailError('Field is required');
+      if (firstEmpty === 'password') setPasswordError('Field is required');
+
+      // focus and shake the first empty field
+      setTimeout(() => {
+        if (firstEmpty === 'name') nameRef.current?.focus();
+        else if (firstEmpty === 'phone') phoneRef.current?.focus();
+        else if (firstEmpty === 'email') emailRef.current?.focus();
+        else if (firstEmpty === 'password') passwordRef.current?.focus();
+        triggerShake();
+      }, 50);
+
+      return;
+    }
+
+    // format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setEmailError('Invalid email address');
+      setTimeout(() => {
+        emailRef.current?.focus();
+        triggerShake();
+      }, 50);
+      return;
+    }
+
+    const cleanedPhone = form.phone.replace(/\D/g, '');
+    if (cleanedPhone.length < 10 || cleanedPhone.length > 10) {
+      setPhoneError('Invalid phone number');
+      setTimeout(() => {
+        phoneRef.current?.focus();
+        triggerShake();
+      }, 50);
+      return;
+    }
+
+    // password complexity checks
+    const pw = form.password || '';
+    const missing: string[] = [];
+    if (pw.length < 8) missing.push('length');
+    if (!/[A-Z]/.test(pw)) missing.push('capital');
+    if (!/[^A-Za-z0-9]/.test(pw)) missing.push('symbol');
+
+    if (missing.length) {
+      const msgs: string[] = [];
+      if (missing.includes('length')) msgs.push('at least 8 characters');
+      if (missing.includes('capital')) msgs.push('an uppercase letter');
+      if (missing.includes('symbol')) msgs.push('a symbol');
+      setPasswordError('Password must include ' + msgs.join(', '));
+      setTimeout(() => {
+        passwordRef.current?.focus();
+        triggerShake();
+      }, 50);
+      return;
+    }
+
+    dispatch(authStart());
     try {
-      dispatch(authStart());
+      // normalize phone to include country code if missing
+      const normalizedPhone = form.phone.startsWith('+') ? form.phone : `+91${cleanedPhone}`;
+      const payload = { ...form, phone: normalizedPhone };
+      const { data } = await startRegister(payload);
+      dispatch(authSuccess(data.token));
+      // persist token and user (use form values as user)
+      try { await AsyncStorage.setItem('token', data.token); } catch (e) { }
+      const userObj = { name: form.name, email: form.email, phone: normalizedPhone, photo: null };
+      try { await AsyncStorage.setItem('user', JSON.stringify(userObj)); } catch (e) { }
+      dispatch(setUser(userObj));
+      console.log('Registration successful, token:', data);
+      // Reset navigation stack so Back button won't return to Register/Login
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'HomeTabs' }],
+      });
+    } catch (error) {
+      console.log('Registration error:', error);
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message || 'Registration failed';
 
-      await startRegister(form);
+      if (status === 409) {
+        // user already exists — highlight email input and show message
+        setEmailError('User already exist');
+        // focus and shake the email input to draw attention
+        setTimeout(() => {
+          emailRef.current?.focus();
+          triggerShake();
+        }, 50);
+      }
 
-      dispatch(setPendingPhone(form.phone));
-      navigation.navigate("Otp");
-    } catch (err) {
-      dispatch(authError(err.response?.data?.message || "Error"));
+      dispatch(authError(message));
     }
   };
 
@@ -58,7 +178,7 @@ export default function RegisterScreen() {
       console.log("User Info Object:", JSON.stringify(userInfo, null, 2));
 
 
-      const idToken = userInfo.idToken;
+      const idToken = userInfo.data?.idToken;
       if (!idToken) throw new Error("No Google ID token");
 
 
@@ -68,12 +188,30 @@ export default function RegisterScreen() {
       console.log("Google register API response:", res.data);
 
       dispatch(authSuccess(res.data.token));
+      try { await AsyncStorage.setItem('token', res.data.token); } catch (e) { }
+      const profile = res?.data?.user
+      console.log('User profile from server response:', profile);
+      try { await AsyncStorage.setItem('user', JSON.stringify(profile)); } catch (e) {}
+      dispatch(setUser(profile));
       navigation.replace("HomeTabs");
     } catch (err) {
       console.log("Google register error (raw):", err);
-      console.log("Google register error message:", err.message);
-      console.log("Google register error code:", err.code);
-      console.log("Google register error stack:", err.stack);
+
+
+      const status = err?.response?.status;
+      if (status === 409) {
+        // user already exists: show themed in-app toast with Login action
+        setToastMessage('User already exists — please login');
+        setToastVisible(true);
+        // animate in
+        Animated.timing(toastOpacity, { toValue: 1, duration: 250, useNativeDriver: true }).start();
+        // auto-hide after 4s
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          Animated.timing(toastOpacity, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => setToastVisible(false));
+          navigation.navigate('Login');
+        }, 4000);
+      }
 
       dispatch(
         authError(
@@ -184,6 +322,44 @@ export default function RegisterScreen() {
     }
   });
 
+  // Toast styles
+  styles.toastContainer = {
+    position: 'absolute',
+    top: 36,
+    left: 16,
+    right: 16,
+    backgroundColor: COLORS.primaryDark,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
+  };
+
+  styles.toastText = {
+    color: '#fff',
+    flex: 1,
+    marginRight: 12,
+  };
+
+  styles.toastAction = {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#fff',
+    borderRadius: 6,
+  };
+
+  styles.toastActionText = {
+    color: COLORS.primary,
+    fontWeight: '700',
+  };
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -207,40 +383,72 @@ export default function RegisterScreen() {
                 Join Trinkoo and start playing & earning
               </Text>
 
-              <Text style={styles.label}>Name</Text>
-              <TextInput
-                placeholder="John Doe"
-                placeholderTextColor="#BDBDBD"
-                style={styles.input}
-                onChangeText={(v) => setForm({ ...form, name: v })}
-              />
+              <Animated.View style={{ transform: [{ translateX: shakeAnim }], width: '100%' }}>
+                <Text style={styles.label}>Name</Text>
+                <TextInput
+                  ref={nameRef}
+                  placeholder="John Doe"
+                  placeholderTextColor="#BDBDBD"
+                  style={[styles.input, nameError ? { borderWidth: 1, borderColor: 'red' } : {}]}
+                  value={form.name}
+                  onChangeText={(v) => {
+                    setForm({ ...form, name: v });
+                    if (nameError) setNameError('');
+                  }}
+                />
+                {nameError ? <Text style={{ color: 'red', alignSelf: 'flex-start', marginTop: 6 }}>{nameError}</Text> : null}
 
-              <Text style={styles.label}>Phone Number</Text>
-              <TextInput
-                placeholder="+91 XXXXX-XXXXX"
-                placeholderTextColor="#BDBDBD"
-                style={styles.input}
-                keyboardType="phone-pad"
-                onChangeText={(v) => setForm({ ...form, phone: v })}
-              />
+                <Text style={styles.label}>Phone Number</Text>
+                <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center' }}>
+                  <View style={{ height: 48, paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#EFEFEF', borderTopLeftRadius: 10, borderBottomLeftRadius: 10, borderWidth: phoneError ? 1 : 0, borderColor: phoneError ? 'red' : 'transparent' }}>
+                    <Text style={{ color: '#333' }}>+91</Text>
+                  </View>
+                  <TextInput
+                    ref={phoneRef}
+                    placeholder=""
+                    placeholderTextColor="#BDBDBD"
+                    style={[{ flex: 1, height: 48, backgroundColor: '#F3F3F3', paddingHorizontal: 12, borderTopRightRadius: 10, borderBottomRightRadius: 10 }, phoneError ? { borderWidth: 1, borderColor: 'red' } : {}]}
+                    keyboardType="phone-pad"
+                    value={form.phone}
+                    onChangeText={(v) => {
+                      // allow entering with or without +91; store raw input
+                      setForm({ ...form, phone: v });
+                      if (phoneError) setPhoneError('');
+                    }}
+                  />
+                </View>
+                {phoneError ? <Text style={{ color: 'red', alignSelf: 'flex-start', marginTop: 6 }}>{phoneError}</Text> : null}
 
-              <Text style={styles.label}>E-mail</Text>
-              <TextInput
-                placeholder="example@gmail.com"
-                placeholderTextColor="#BDBDBD"
-                style={styles.input}
-                keyboardType="email-address"
-                onChangeText={(v) => setForm({ ...form, email: v })}
-              />
+                <Text style={styles.label}>E-mail</Text>
+                <TextInput
+                  ref={emailRef}
+                  placeholder="example@gmail.com"
+                  placeholderTextColor="#BDBDBD"
+                  style={[styles.input, emailError ? { borderWidth: 1, borderColor: 'red' } : {}]}
+                  keyboardType="email-address"
+                  value={form.email}
+                  onChangeText={(v) => {
+                    setForm({ ...form, email: v });
+                    if (emailError) setEmailError('');
+                  }}
+                />
+                {emailError ? <Text style={{ color: 'red', alignSelf: 'flex-start', marginTop: 6 }}>{emailError}</Text> : null}
 
-              <Text style={styles.label}>Password</Text>
-              <TextInput
-                placeholder="********"
-                placeholderTextColor="#BDBDBD"
-                secureTextEntry
-                style={styles.input}
-                onChangeText={(v) => setForm({ ...form, password: v })}
-              />
+                <Text style={styles.label}>Password</Text>
+                <TextInput
+                  ref={passwordRef}
+                  placeholder="********"
+                  placeholderTextColor="#BDBDBD"
+                  secureTextEntry
+                  style={[styles.input, passwordError ? { borderWidth: 1, borderColor: 'red' } : {}]}
+                  value={form.password}
+                  onChangeText={(v) => {
+                    setForm({ ...form, password: v });
+                    if (passwordError) setPasswordError('');
+                  }}
+                />
+                {passwordError ? <Text style={{ color: 'red', alignSelf: 'flex-start', marginTop: 6 }}>{passwordError}</Text> : null}
+              </Animated.View>
 
               <TouchableOpacity activeOpacity={0.85} style={styles.button} onPress={handleRegister}>
                 <Text style={styles.buttonText}>Register</Text>
@@ -261,7 +469,7 @@ export default function RegisterScreen() {
                 />
                 <Text style={styles.googleText}>Register with Google</Text>
               </TouchableOpacity>
-             
+
 
               <Text style={styles.footer}>
                 Already have account?{' '}
@@ -275,9 +483,31 @@ export default function RegisterScreen() {
             </View>
           </View>
         </ScrollView>
+
+        {toastVisible ? (
+          <Animated.View
+            style={[
+              styles.toastContainer,
+              { opacity: toastOpacity, transform: [{ translateY: toastOpacity.interpolate({ inputRange: [0, 1], outputRange: [-10, 0] }) }] },
+            ]}
+          >
+            <Text style={styles.toastText}>{toastMessage}</Text>
+            <TouchableOpacity
+              style={styles.toastAction}
+              onPress={() => {
+                if (toastTimer) clearTimeout(toastTimer);
+                Animated.timing(toastOpacity, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => setToastVisible(false));
+                navigation.navigate('Login');
+              }}
+            >
+              <Text style={styles.toastActionText}>Login</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        ) : null}
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 
 
 }
+

@@ -14,4 +14,9 @@ export const registerWithGoogle = (idToken) => {
 export const loginWithGoogle = (idToken) => {
   return api.post("/auth/login-with-google", { idToken });
 };
+
+// standard login with email & password
+export const login = (data) => {
+  return api.post('/auth/login', data);
+};
   

@@ -8,9 +8,11 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../theme/colors';
+import { useSelector } from 'react-redux';
 
 export default function ProfileHeader() {
   const navigation = useNavigation();
+  const user = useSelector((state: any) => state.auth.user);
 
   return (
     <View style={styles.container}>
@@ -29,7 +31,7 @@ export default function ProfileHeader() {
       {/* Avatar */}
       <View style={styles.avatarWrapper}>
         <Image
-          source={{ uri: 'https://i.pravatar.cc/150' }}
+          source={ user?.photo ? { uri: user.photo } : { uri: 'https://i.pravatar.cc/150' } }
           style={styles.avatar}
         />
 
@@ -40,9 +42,9 @@ export default function ProfileHeader() {
       </View>
 
       {/* Name */}
-      <Text style={styles.name}>Wan Sabrina Mayzura</Text>
+      <Text style={styles.name}>{user?.name || 'Wan Sabrina Mayzura'}</Text>
       <Text style={styles.username}>
-        @wansabrina | +6281247029597
+        {user?.email ? `@${(user.email.split('@')[0] || '').replace(/[^a-zA-Z0-9_.-]/g, '')} | ${user?.phone || ''}` : '@wansabrina | +6281247029597'}
       </Text>
     </View>
   );

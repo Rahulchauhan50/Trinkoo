@@ -6,7 +6,8 @@ const authSlice = createSlice({
     token: null,
     loading: false,
     error: null,
-    pendingPhone: null
+    pendingPhone: null,
+    user: null
   },
   reducers: {
     authStart: (state) => {
@@ -16,6 +17,17 @@ const authSlice = createSlice({
     authSuccess: (state, action) => {
       state.loading = false;
       state.token = action.payload;
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
+      console.log('User set in auth slice:', action.payload);
+    },
+    logout: (state) => {
+      state.token = null;
+      state.loading = false;
+      state.error = null;
+      state.pendingPhone = null;
+      state.user = null;
     },
     authError: (state, action) => {
       state.loading = false;
@@ -31,7 +43,9 @@ export const {
   authStart,
   authSuccess,
   authError,
-  setPendingPhone
+  setPendingPhone,
+  logout,
+  setUser
 } = authSlice.actions;
 
 export default authSlice.reducer;

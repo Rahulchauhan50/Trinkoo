@@ -33,11 +33,11 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function AppNavigator() {
+export default function AppNavigator({ initialRouteName = 'Onboarding' }: { initialRouteName?: string }) {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Onboarding"
+        initialRouteName={initialRouteName}
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
